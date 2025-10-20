@@ -1,9 +1,10 @@
-name: Auto Key Generator (5 Mins)
+name: Auto Key Generator (2 Jam)
 
 on:
-  # Menjalankan workflow setiap 5 menit
+  # Penjadwalan: dijalankan setiap 2 jam
   schedule:
-    - cron: '*/5 * * * *'
+    # '0 */2 * * *' artinya: Pada menit ke-0, setiap 2 jam
+    - cron: '0 */2 * * *'
   # Memungkinkan trigger manual
   workflow_dispatch:
 
@@ -44,6 +45,6 @@ jobs:
         # Menggunakan Action otomatis untuk melakukan commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "🤖 Auto: Update random_keys.json (Cron by GitHub)"
+          commit_message: "🤖 Auto: Update random_keys.json (Cron 2 Jam)"
           file_pattern: random_keys.json
           # Action ini akan menggunakan GITHUB_TOKEN bawaan dengan izin 'contents: write'
