@@ -1,0 +1,49 @@
+name: Auto Key Generator (5 Mins)
+
+on:
+  # Menjalankan workflow setiap 5 menit
+  schedule:
+    - cron: '*/5 * * * *'
+  # Memungkinkan trigger manual
+  workflow_dispatch:
+
+# Izin ini penting untuk memungkinkan Action meng-commit file baru
+permissions:
+  contents: write 
+
+jobs:
+  generate_and_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Menggunakan Python untuk memastikan fungsi string dan random tersedia
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate Random Keys and Token
+        run: |
+          # Menghasilkan Key acak (20 karakter alfanumerik)
+          KEY=$(python -c "import random, string; print(''.join(random.choices(string.ascii_letters + string.digits, k=20)))")
+          # Menghasilkan Token acak (6 digit angka)
+          TOKEN=$(python -c "import random, string; print(''.join(random.choices(string.digits, k=6)))")
+
+          # Buat konten JSON baru ke random_keys.json
+          echo "{" > random_keys.json
+          echo "  \"Key\": \"$KEY\"," >> random_keys.json
+          echo "  \"token\": \"$TOKEN\"" >> random_keys.json
+          echo "}" >> random_keys.json
+          
+          echo "Generated New Key: $KEY"
+          echo "Generated New Token: $TOKEN"
+
+      - name: Commit and Push Changes
+        # Menggunakan Action otomatis untuk melakukan commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Auto: Update random_keys.json (Cron by GitHub)"
+          file_pattern: random_keys.json
+          # Action ini akan menggunakan GITHUB_TOKEN bawaan dengan izin 'contents: write'
